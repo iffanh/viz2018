@@ -131,45 +131,45 @@ void CreateRGBColorMapping() {
                     {
                         
                         element = data[i][j];
-                        //The Red-White-Blue color scheme
-                        if( element >= 64)         
-                        {
-                            RGBArray[textureNr][3*pixelCounter]   = 255;
-                            RGBArray[textureNr][3*pixelCounter+1] = 0;
-                            RGBArray[textureNr][3*pixelCounter+2] = 0;
-                        }
-                        else if( element >= -16 )    
-                        {
-                            RGBArray[textureNr][3*pixelCounter]   = 255;
-                            RGBArray[textureNr][3*pixelCounter+1] = 255;
-                            RGBArray[textureNr][3*pixelCounter+2] = 255;
-                        }
-                        else if( element < -16 )   
-                        {
-                            RGBArray[textureNr][3*pixelCounter]   = 0;
-                            RGBArray[textureNr][3*pixelCounter+1] = 0;
-                            RGBArray[textureNr][3*pixelCounter+2] = 255;
-                        }
-
-                        // // White-Grey-Black color scheme
-                        // if( element >= 32)         
+                        // //The Red-White-Blue color scheme
+                        // if( element >= 64)         
+                        // {
+                        //     RGBArray[textureNr][3*pixelCounter]   = 255;
+                        //     RGBArray[textureNr][3*pixelCounter+1] = 0;
+                        //     RGBArray[textureNr][3*pixelCounter+2] = 0;
+                        // }
+                        // else if( element >= -16 )    
                         // {
                         //     RGBArray[textureNr][3*pixelCounter]   = 255;
                         //     RGBArray[textureNr][3*pixelCounter+1] = 255;
                         //     RGBArray[textureNr][3*pixelCounter+2] = 255;
                         // }
-                        // else if( element >= -32 )    
-                        // {
-                        //     RGBArray[textureNr][3*pixelCounter]   = 192;
-                        //     RGBArray[textureNr][3*pixelCounter+1] = 192;
-                        //     RGBArray[textureNr][3*pixelCounter+2] = 192;
-                        // }
-                        // else if( element < -32 )   
+                        // else if( element < -16 )   
                         // {
                         //     RGBArray[textureNr][3*pixelCounter]   = 0;
                         //     RGBArray[textureNr][3*pixelCounter+1] = 0;
-                        //     RGBArray[textureNr][3*pixelCounter+2] = 0;
+                        //     RGBArray[textureNr][3*pixelCounter+2] = 255;
                         // }
+
+                        // White-Grey-Black color scheme
+                        if( element >= 32)         
+                        {
+                            RGBArray[textureNr][3*pixelCounter]   = 255;
+                            RGBArray[textureNr][3*pixelCounter+1] = 255;
+                            RGBArray[textureNr][3*pixelCounter+2] = 255;
+                        }
+                        else if( element >= -32 )    
+                        {
+                            RGBArray[textureNr][3*pixelCounter]   = 192;
+                            RGBArray[textureNr][3*pixelCounter+1] = 192;
+                            RGBArray[textureNr][3*pixelCounter+2] = 192;
+                        }
+                        else if( element < -32 )   
+                        {
+                            RGBArray[textureNr][3*pixelCounter]   = 0;
+                            RGBArray[textureNr][3*pixelCounter+1] = 0;
+                            RGBArray[textureNr][3*pixelCounter+2] = 0;
+                        }
                     }
                     pixelCounter++; // Pixel color has been set; incrementing to next pixel
                 }
@@ -233,7 +233,7 @@ void buildTextures() {
 *|------------------------------------------------------|
 */
 void drawTiles() {
-    
+    int count = 0;
     for (int row=0; row<TEX_ROWS; row++)
     {
         for (int col=0; col<TEX_COLS; col++)
@@ -256,17 +256,14 @@ void drawTiles() {
             glEnableClientState(GL_TEXTURE_COORD_ARRAY);
             glVertexPointer(3, GL_FLOAT, 0, vertexCoords);
             glTexCoordPointer(2, GL_FLOAT, 0, textureCoords);
-            int count = 1;
 
             glLoadIdentity();
             glRotatef(-90.0f, 0.0f, 0.0f, 1.0f);
-            glTranslatef(x + 0.0, y + -(TEX_COLS - 1) + col*2, z - 10.0f);  // MODIFY THIS
-            //for (int i = 0; i<count; i++) {               
-                //glTranslatef(0.0, 2.0, 0.0f);  // MODIFY THIS
-                glBindTexture(GL_TEXTURE_2D, textures[col]); // MODIFY THE INDEX INTO textures
-                glDrawArrays(GL_QUADS, 0, 4);
+            glTranslatef(x + -(TEX_ROWS - 1) + row*2, y + -(TEX_COLS - 1) + col*2, z - 10.0f);  // MODIFY THIS
+            glBindTexture(GL_TEXTURE_2D, textures[count]); // MODIFY THE INDEX INTO textures
+            glDrawArrays(GL_QUADS, 0, 4);
             //}
-            
+            count += 1;
         }
     }
 }
@@ -326,12 +323,13 @@ void renderScene(void) {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // Clear Color and Depth Buffers
 	glLoadIdentity(); // Reset transformations
 
-    gluLookAt(	0.0, 0.0, 12.0,   // Eye position (x, y, z)
-			    0.0, 0.0, 0.0,   // Look at position (x, y, z)
-			    0.0, 0.0, 0.0);  // Up-vector (x, y, z)
+    glMatrixMode(GL_MODELVIEW);  // get back to modelview mode
+    gluLookAt(	0.0, 0.0, 10.0,   // Eye position (x, y, z)
+			    0.0, -10.0, 0.0,   // Look at position (x, y, z)
+			    0.0, 1.0, 0.0);  // Up-vector (x, y, z)
 
     drawTiles();                 // Draw the wanted shape
-	glMatrixMode(GL_MODELVIEW);  // get back to modelview mode
+	//glMatrixMode(GL_MODELVIEW);  // get back to modelview mode
 	glutSwapBuffers();           // Display our matrix (i.e. the figure)
 }
 
@@ -349,7 +347,7 @@ void changeSize(int w, int h) {
 	glMatrixMode(GL_PROJECTION); // Use the Projection Matrix
 	glLoadIdentity(); // Reset Matrix
 	glViewport(0, 0, w, h); // Set the viewport to be the entire window
-	gluPerspective(35.0f, ratio, 0.1f, 100.0f); // Set the correct perspective.
+	gluPerspective(60.0f, ratio, 0.1f, 100.0f); // Set the correct perspective.
 	glMatrixMode(GL_MODELVIEW); // Get Back to the Modelview
 }
 
@@ -365,7 +363,7 @@ int main(int argc, char **argv) {
 	glutInit(&argc, argv);
 	glutInitDisplayMode(GLUT_DEPTH | GLUT_DOUBLE | GLUT_RGBA);
 	glutInitWindowPosition(100,100);
-	glutInitWindowSize(640,640);
+	glutInitWindowSize(1600,640);
 	glutCreateWindow("Project 1");
 
 	// register glut callbacks
